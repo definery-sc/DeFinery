@@ -1,9 +1,9 @@
 /*
  * Adapted from https://smartcontractsecurity.github.io/SWC-registry/docs/SWC-105#wallet-02-refund-nosubsol,
- * https://github.com/smartbugs/smartbugs/blob/master/dataset/access_control/wallet_02_refund_nosub.sol
+ * Adapted from https://github.com/smartbugs/smartbugs/blob/master/dataset/access_control/wallet_02_refund_nosub.sol,
+ * https://smartcontractsecurity.github.io/SWC-registry/docs/SWC-105#wallet-02-refund-nosubsol
  * Vulnerable_at_lines: 40
  */
-
 
  /* User can add pay in and withdraw Ether.
     Unfortunately the developer forgot set the user's balance to 0 when refund() is called.
