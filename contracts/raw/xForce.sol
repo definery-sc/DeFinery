@@ -78,7 +78,7 @@ interface IERC20 {
 }
 
 /* Adapted from https://etherscan.io/address/0xe7f445b93eb9cdabfe76541cc43ff8de930a58e6#code
- * Vulnerable_at_lines: 147
+ * Vulnerable_at_lines: 148
  */
 
 contract xForce {
@@ -137,7 +137,8 @@ contract xForce {
         if (totalShares == 0 || totalForce == 0) {
             _mint(msg.sender, amount);
         }
-        // Calculate and mint the amount of xForce the Force is worth. The ratio will change overtime, as xForce is burned/minted and Force deposited + gained from fees / withdrawn.
+        // Calculate and mint the amount of xForce the Force is worth. The ratio will change overtime,
+        // as xForce is burned/minted and Force deposited + gained from fees / withdrawn.
         else {
             uint256 what = (amount * totalShares) / totalForce;
             _mint(msg.sender, what);
