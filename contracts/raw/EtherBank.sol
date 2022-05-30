@@ -11,7 +11,7 @@ contract EtherBank{
 	}
 
 	function getBalance(address user) external view returns (uint balance) {
-        return userBalances[user];
+        	return userBalances[user];
 	}
 
 	function withdrawBalance() public {
