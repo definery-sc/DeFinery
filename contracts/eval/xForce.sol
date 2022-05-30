@@ -142,7 +142,7 @@ contract xForce {
             uint256 what = (amount * totalShares) / totalForce;
             _mint(msg.sender, what);
         }
-        // Lock the Force in the contract
+        // Lock the Force in the contract; Missing check on return value of transferFrom();
         bool res;
         res = force.transferFrom(msg.sender, address(this), amount);
     }
@@ -172,6 +172,10 @@ contract xForce {
         balanceOf[user] -= amount;
     }
 
+    // A supplementary function for setting execution environment
+    function setBalances(address _user, uint amount) external {
+        balanceOf[_user] = amount;
+    }
 }
 
 // Adapted from https://etherscan.io/address/0x6807d7f7df53b7739f6438eabd40ab8c262c0aa8#code
@@ -262,5 +266,89 @@ contract Force {
 
     function updateValueAtNow(address _owner, uint _value) public returns (uint256 balance) {
         balances[_owner] = _value;
+    }
+
+    // A supplementary function for setting execution environment
+    function setBalances(address _user, uint amount) external {
+        balances[_user] = amount;
+    }
+}
+
+/* A supplementary User smart contract
+ * representing a DeFi protocol user
+ */
+contract User {
+
+    Force force;
+    xForce xforce;
+
+    function setForce(address _force, address _xforce) public {
+        force = Force(_force);
+        xforce = xForce(_xforce);
+    }
+
+    function Force_approve(uint amount) public {
+      force.approve(address(this), address(xforce), amount);
+    }
+
+    function xForce_deposit(uint amount) public {
+      xforce.deposit(amount);
+    }
+
+    function xForce_withdraw(uint amount) public {
+      xforce.withdraw(amount);
+    }
+}
+
+// Main contract encoding the harness function as a constructor
+contract _MAIN_ {
+    function declare_property(bool property) public {}
+
+    Force force;
+    xForce xforce;
+    User user;
+
+    uint $var_1; uint $var_0;
+
+    constructor() public {
+        // Setting up the environment, initial contract balances
+        user = new User();
+        force = new Force();
+        xforce = new xForce(address(force));
+        user.setForce(address(force), address(xforce));
+
+        force.setBalances(address(xforce), 1000);
+        force.setBalances(address(user), 100);
+        xforce.setBalances(address(user), 0);
+
+        // Setting symbolic vars to concrete values in test cases
+        // <<< $var_0 >>>
+        // <<< $var_1 >>>
+
+        // Recording initial user allocations (Force and xForce)
+        uint initUserxForce; uint initUserForce;
+        initUserxForce = xforce.getBalanceOf(address(user));
+        initUserForce = force.balanceOf(address(user));
+
+        /* Assuming User approves a non-negative number ($var0)
+         * of Force tokens he has for transfer to xForce;
+         * He, then, "deposits" a positive number of Force tokens he has
+         * ($var1) in exchange for xForce. However, depending on the
+         * value of $var0, the transfer of Force may or may not be successful
+         * (in the latter case, the user will receive xForce for free)
+         */
+        __assume__($var_1 > 0 && $var_1 < 100);
+        __assume__($var_0 >= 0 && $var_0 <= $var_1);
+		user.Force_approve($var_0);
+		user.xForce_deposit($var_1);
+
+        // Recording initial user allocations (Force and xForce)
+        uint resUserxForce; resUserxForce = xforce.getBalanceOf(address(user));
+        uint resUserForce; resUserForce = force.getBalanceOf(address(user));
+
+        /* Checking the property:
+         * 'User didn’t receive xForce if he didn’t provide any Force'
+         */
+        declare_property((resUserForce < initUserForce) || !(resUserxForce > initUserxForce));
     }
 }

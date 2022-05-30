@@ -41,6 +41,11 @@ contract USDC {
 
         return true;
     }
+
+    // A supplementary function for setting execution environment
+    function setBalances(address _user, uint amount) external {
+        balanceOf[_user] = amount;
+    }
 }
 
 /* Adapted from https://github.com/dapphub/ds-token/blob/master/src/token.sol,
@@ -85,11 +90,16 @@ contract DAI {
 
         return true;
     }
+
+    // A supplementary function for setting execution environment
+    function setBalances(address _user, uint amount) external {
+        balanceOf[_user] = amount;
+    }
 }
 
 /* Adapted from https://github.com/Uniswap/v2-core/blob/master/contracts/UniswapV2Pair.sol,
  * https://twitter.com/FrankResearcher/status/1387347036916260869
- * Vulnerable_at_lines: 155
+ * Vulnerable_at_lines: 165
  */
 
 contract Uranium {
@@ -151,7 +161,7 @@ contract Uranium {
         uint balance1Adjusted;
         balance1Adjusted = (balance1 * 100);
 
-        // Vulnerable statement causing the exploit:
+        // Vulnerable statement causing the exploit, a constant should have been 100 instead of 10
         require(balance0Adjusted * balance1Adjusted >= _reserve0 * _reserve1 * 10**2, 'UniswapV2: K');
 
         _update(balance0, balance1, _reserve0, _reserve1);
@@ -160,5 +170,76 @@ contract Uranium {
     function _update(uint _balance0, uint _balance1, uint _reserve0, uint _reserve1) private {
         reserve0 = _balance0;
         reserve1 = _balance1;
+    }
+}
+
+// Main contract encoding the harness function as a constructor
+contract _MAIN_ {
+    function declare_property(bool property) public {}
+
+    mapping(address=>uint) public init;
+    mapping(address=>uint) public res;
+    uint $init0;
+    uint $init1;
+
+    /* Values of state variables prefixed with testVal
+     * are being automatically checked when executing
+     * test cases (in addition to validity checking
+     * of the execution trace)
+     */
+    uint testVal_0;
+    uint testVal_1;
+
+    constructor() public {
+        Uranium uranium;
+        USDC usdc;
+        DAI dai;
+
+        // Setting up the environment, initial contract balances
+        usdc = new USDC();
+        dai = new DAI();
+        uranium = new Uranium(1000, 1000, address(usdc), address(dai));
+        address urn; urn = address(uranium);
+
+        dai.setBalances(urn, 1000);
+        usdc.setBalances(urn, 1000);
+        dai.setBalances(address(this), 100);
+        usdc.setBalances(address(this), 0);
+
+        // Setting symbolic vars to concrete values in test cases
+        // <<< $init0 >>>
+        // <<< $init1 >>>
+
+        // Recording initial allocations (reserves) of Uranium in DAI, USDC
+        init[urn] = dai.getBalanceOf(urn);
+        uint urn_usdc_init; urn_usdc_init = usdc.getBalanceOf(urn);
+        init[urn] = urn_usdc_init * init[urn];
+
+        // Successfully transferring DAI to Uranium
+        __assume__($init0 > 0 && $init0 <= 100);
+        dai.transferFrom(address(this), urn, $init0);
+
+        /* Retrieving a positive amount of USDC from Uranium in return
+         * for transferred DAI; depending of the amount of USDC, this
+         * call might be valid or malicious
+         */
+        __assume__($init1 > 0 && $init1 < 1000);
+        uranium.swap($init1, 0, address(this));
+
+        // Recording resulting allocations (reserves) of Uranium in DAI, USDC
+        res[urn] = dai.getBalanceOf(urn);
+        uint urn_usdc; urn_usdc = usdc.getBalanceOf(urn);
+        res[urn] =  res[urn] * urn_usdc;
+
+        /* Recording control variable values for more accurate
+         * test case results (optional)
+         */
+        testVal_0 = res[address(urn)];
+        testVal_1 = res[address(this)];
+
+        /* Checking the property:
+         * 'Constant product of Uranium (pool) reserves is non-decreasing'
+         */
+        declare_property(res[urn] >= init[urn]);
     }
 }

@@ -1,7 +1,7 @@
 /* Adapted from https://github.com/smartbugs/smartbugs/blob/master/dataset/reentrancy/etherbank.sol,
  * https://github.com/seresistvanandras/EthBench/blob/master/Benchmark/Simple/reentrant.sol
  * Vulnerable_at_lines: 20
- */
+*/
 
 contract EtherBank{
     mapping (address => uint) userBalances;
@@ -11,7 +11,7 @@ contract EtherBank{
 	}
 
 	function getBalance(address user) external view returns (uint balance) {
-        	return userBalances[user];
+        return userBalances[user];
 	}
 
 	function withdrawBalance() public {

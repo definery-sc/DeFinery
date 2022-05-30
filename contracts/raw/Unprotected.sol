@@ -1,6 +1,7 @@
-/* Adapted from https://github.com/trailofbits/not-so-smart-contracts/blob/master/unprotected_function/Unprotected.sol,
+/*
+ * Adapted from https://github.com/trailofbits/not-so-smart-contracts/blob/master/unprotected_function/Unprotected.sol,
  * https://github.com/smartbugs/smartbugs/blob/master/dataset/access_control/unprotected0.sol
- * Vulnerable_at_lines: 23
+ * Vulnerable_at_lines: 25
  */
 
  contract Unprotected{
@@ -18,6 +19,7 @@
      }
 
      // <yes> <report> ACCESS_CONTROL
+     // Missing an (owner == msg.sender) check
      function changeOwner(address _newOwner)
         public
      {

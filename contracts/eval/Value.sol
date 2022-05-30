@@ -56,10 +56,15 @@ contract Token {
 
         return true;
     }
+
+    // A supplementary function for setting execution environment
+    function setBalances(address _user, uint amount) external {
+        balanceOf[_user] = amount;
+    }
 }
 
 /* Adapted from https://bscscan.com/address/0x7a8ac384d3a9086afcc13eb58e90916f17affc89#code
- * Vulnerable_at_lines: 149 or 158
+ * Vulnerable_at_lines: 154 or 163
  */
 
 contract Value {
@@ -155,6 +160,7 @@ contract Value {
 
         operator = msg.sender;
         _locked = 0;
+        // Missing 'initialized = true';
     }
 
     function setOperator(address _operator) external onlyOperator {
@@ -237,5 +243,91 @@ contract Value {
     ) external onlyOperator() {
         require(_token != stakeToken, "stakeToken");
         Token(_token).doTransfer(to, amount);
+    }
+}
+
+/* A supplementary User smart contract
+ * representing a DeFi protocol user
+ */
+contract User {
+    Value value;
+    function setValue(address _value) public {
+        value = Value(_value);
+    }
+
+    function initialize(address _stake, address _wbnb, address _busd) public {
+        value.initialize(_stake, _wbnb, _busd, address(this), 10);
+    }
+
+    function governanceRecoverUnsupported(address _token) public {
+        value.governanceRecoverUnsupported(_token, 100, address(this));
+    }
+}
+
+// Main contract encoding the harness function as a constructor
+contract _MAIN_ {
+    function declare_property(bool property) public {}
+
+    mapping(address=>uint) public init;
+    mapping(address=>uint) public res;
+
+    Value pool;
+    User user;
+    Token wbnb;
+    Token busd;
+    Token stake;
+    Token hacker;
+    Token new_wbnb;
+    Token new_busd;
+
+    uint $calling_init;
+    constructor() public {
+        // Setting up the environment
+        user = new User();
+        wbnb = new Token();
+        busd = new Token();
+        stake = new Token();
+        hacker = new Token();
+        pool = new Value();
+        new_wbnb = new Token();
+        new_busd = new Token();
+
+        // Setting symbolic vars to concrete values in test cases
+        // <<< $calling_init >>>
+
+        // Correctly calling initialize() for the first time to setup the contract
+        pool.initialize(address(stake), address(wbnb), address(busd), address(this), 0);
+        user.setValue(address(pool));
+
+        // Recording the initial address of stakeToken that users can deposit to Value
+        address oldToken;
+        oldToken = pool.getStakeToken();
+
+        /* Assuming that initialized() can be called by Main (this address, operator of Value),
+         * User, or can not be called at all;
+         * AND that this call resets variable values (which is necessary to execute an attack)
+         */
+        __assume__($calling_init == 0 || $calling_init == 1 || $calling_init == 2);
+        address new_stake; new_stake = address(hacker);
+
+        if ($calling_init == 0) {
+            user.initialize(new_stake, address(new_wbnb), address(new_busd));
+        } else if ($calling_init == 1) {
+            pool.initialize(new_stake, address(new_wbnb), address(new_busd), address(this), 0);
+        } else {
+            // Not calling initialize() again
+        }
+
+        // Recording the resulting address of stakeToken
+        address newToken;
+        newToken = pool.getStakeToken();
+
+        /* Checking the property:
+         * 'The staked token can’t be changed';
+         * Since changing the token address can only be performed by
+         * calling initialize() after its called the first time, this
+         * property is an under-approximation of 'initialized() can only be called once'
+         */
+        declare_property(oldToken == newToken && oldToken == address(stake));
     }
 }
