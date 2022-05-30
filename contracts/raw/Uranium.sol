@@ -38,7 +38,6 @@ contract USDC {
         balanceOf[src] -= wad;
         balanceOf[dst] += wad;
 
-
         return true;
     }
 }
@@ -89,7 +88,7 @@ contract DAI {
 
 /* Adapted from https://github.com/Uniswap/v2-core/blob/master/contracts/UniswapV2Pair.sol,
  * https://twitter.com/FrankResearcher/status/1387347036916260869
- * Vulnerable_at_lines: 155
+ * Vulnerable_at_lines: 154
  */
 
 contract Uranium {
