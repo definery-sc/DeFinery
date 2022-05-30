@@ -9,7 +9,7 @@ A companion website with more detailed documentation can be found at: https://si
 
 We evaluated our tool on a dataset of 9 smart contracts that include 5 real-world DeFi smart contracts and 4 benchmark smart contracts selected from the [SmartBugs](https://github.com/smartbugs/smartbugs) dataset. The analyzed smart contracts are available in the [/contracts](https://github.com/definery-sc/DeFinery/tree/main/contracts) folder. The [/raw](https://github.com/definery-sc/DeFinery/tree/main/contracts/eval) folder contains adapted source code of the analyzed smart contracts, while [/eval](https://github.com/definery-sc/DeFinery/tree/main/contracts/eval) contains files that were symbolically analyzed, i.e., they include analyzed smart contract code, the Main contract encoding the harness function for symbolic analysis, and supplementary code (e.g., User smart contracts).
 
-[/raw_results](https://github.com/definery-sc/DeFinery/tree/main/raw_results) reports raw experimental data for running our tool on our experimental dataset. On average, it tool **DeFinery** 53 seconds to analyze and fix a smart contract. We provide more detailed statistics on our [website](https://sites.google.com/view/ase2022-definery/).
+[/raw_results](https://github.com/definery-sc/DeFinery/tree/main/raw_results) reports raw experimental data for running our tool on our dataset. On average, it tool **DeFinery** 53 seconds to analyze and fix a smart contract. We provide more detailed statistics on our [website](https://sites.google.com/view/ase2022-definery/).
 
 ## Quick Start
 
