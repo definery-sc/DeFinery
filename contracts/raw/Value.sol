@@ -188,7 +188,6 @@ contract Value {
     // Withdraw LP tokens.
     function _withdraw(address _account, uint256 _amount) internal lock {
         UserInfo storage user = userInfo[_account];
-        // getAllRewards(_account);
         if (_amount > 0) {
             user.amount = user.amount - _amount;
             Token staked;
