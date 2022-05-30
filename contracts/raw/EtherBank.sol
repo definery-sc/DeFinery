@@ -16,7 +16,7 @@ contract EtherBank{
 
 	function withdrawBalance() public {
 		uint amountToWithdraw;
-        amountToWithdraw = userBalances[msg.sender];
+		amountToWithdraw = userBalances[msg.sender];
 	    msg.sender.call.value(amountToWithdraw);
 		userBalances[msg.sender] = 0;
 	}
