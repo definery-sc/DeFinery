@@ -110,11 +110,13 @@
         old_user_balance = address(user).balance + old_usr_balance;
 
         /* Assuming that calls sending ETH are successful, i.e., do
-         * not exceed contract balances
+         * not exceed contract balances, which are reasonably big
+         * (values that are too big may cause 'not fitting in a machine uint'
+         * issues in z3)
          */
         __assume__($value > 0 && $value < 90);
-        __assume__(address(this).balance >= $value);
-        __assume__(address(user).balance >= $value);
+        __assume__(address(this).balance >= $value && address(this).balance <= 10000);
+        __assume__(address(user).balance >= $value && address(user).balance <= 10000);
 
         /* Assuming deposit() and refund() can each be called
          * by (1) User or (2) Main (this contract)
