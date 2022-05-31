@@ -1,3 +1,0 @@
-[setuptools.installation]
-eggsecutable = __main__:main
-
