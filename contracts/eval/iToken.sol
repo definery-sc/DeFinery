@@ -168,7 +168,7 @@ contract _MAIN_ {
 
         __assume__($var_0 > 0);
         // Transferring positive number of tokens from User to another address
-		user.transferTo(_to, $var_0);
+	user.transferTo(_to, $var_0);
 
         // Recording resulting allocations of participating contracts
         res[address(this)] = token.getBalances(address(this));
