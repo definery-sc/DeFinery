@@ -1,5 +1,4 @@
-/* Adapted from https://github.com/dapphub/ds-token/blob/master/src/token.sol,
- * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol
+/* Adapted from https://etherscan.io/address/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2#code
  */
 
 contract WETH {
